@@ -49,7 +49,6 @@ it('should return bad request on passing empty text' ,()=>{
       done();
     }).catch((e)=>{
       done(e);
-
   });
 });
 });

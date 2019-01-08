@@ -23,6 +23,14 @@ app.post('/todos',(req,res)=>{
 });
 
 
+app.get('/todos',(req,res)=>{
+  Todo.find().then((docs)=>{
+    res.status(200).send({docs})
+  }, (err)=>{
+    console.log(err);
+  });
+});
+
 
 app.listen(3000,()=>{
   console.log('Server is connected...');
