@@ -4,10 +4,12 @@ const request = require('supertest');
 var {app} = require('./../server');
 var {Todo} = require('./../models/todo');
 
+const todos =[{text:'new test todo'},{text:'new test2 todo'}]
+
 beforeEach((done)=>{
   Todo.remove({}).then((docs)=>{
-    done();
-  })
+    return Todo.insertMany(todos);
+  }).then(()=> done());
 });
 
 describe('POST /todos' , ()=>{
@@ -24,7 +26,7 @@ describe('POST /todos' , ()=>{
       if(err){
         return done(err);
       }
-        Todo.find().then((docs)=>{
+        Todo.find({text}).then((docs)=>{
           expect(docs.length).toBe(1);
           expect(docs[0].text).toBe(text);
           done();
@@ -45,11 +47,32 @@ it('should return bad request on passing empty text' ,()=>{
     }
 
     Todo.find().then((docs)=>{
-      expect(docs.length).toBe(1);
+      expect(docs.length).toBe(2);
       done();
     }).catch((e)=>{
       done(e);
   });
+});
+});
+
+it('should get all the todos' ,(done)=>{
+  request(app)
+  .get('/todos')
+  .send()
+  .expect(200)
+  .expect((res)=>{
+    expect(res.body.docs.length).toBe(2);
+  })
+  .end((err ,res)=>{
+    if(err){
+      return done(err);
+    }
+    Todo.find().then((docs)=>{
+      expect(docs.length).toBe(2);
+      done();
+    }).catch((e)=>{
+      done(e);
+    });
 });
 });
 });
