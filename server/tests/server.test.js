@@ -1,10 +1,18 @@
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectID} =require('mongodb');
 
 var {app} = require('./../server');
 var {Todo} = require('./../models/todo');
 
-const todos =[{text:'new test todo'},{text:'new test2 todo'}]
+const todos =[{
+  _id: new ObjectID(),
+  text:'new test todo'
+},
+{
+  _id: new ObjectID(),
+  text:'new test2 todo'
+}]
 
 beforeEach((done)=>{
   Todo.remove({}).then((docs)=>{
@@ -75,4 +83,36 @@ it('should get all the todos' ,(done)=>{
     });
 });
 });
+
+it('should get the correct todo' ,(done)=>{
+  request(app)
+  .get(`/todos/${todos[0]._id.toHexString()}`)
+  .send()
+  .expect(200)
+  .expect((res)=>{
+    expect(res.body.todo.text).toBe(todos[0].text);
+  })
+  .end(done);
+});
+
+it('should give empty object when no id has been found' ,(done)=>{
+var id ='6c34cd2d5847ba8ae9dbcaee';
+request(app)
+.get('/todos/id')
+.expect(404)
+.end(done);
+});
+
+
+it('should give empty object when no id has been found' ,(done)=>{
+
+request(app)
+.get('/todos/123')
+.expect(404)
+.end(done);
+});
+
+
+
+
 });
