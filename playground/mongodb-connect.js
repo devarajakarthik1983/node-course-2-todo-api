@@ -12,33 +12,33 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (error,client)=>{
   }
 
   const db = client.db('TodoApp');
-  db.collection('TodoApp').insertOne({
-    name:'Karthik',
-    completedAt: true
-  },(err,res)=>{
-    if(err){
-      return console.log('Unable to insert data' , err);
-    }
+//   db.collection('TodoApp').insertOne({
+//     name:'Karthik',
+//     completedAt: true
+//   },(err,res)=>{
+//     if(err){
+//       return console.log('Unable to insert data' , err);
+//     }
+//
+//   console.log(JSON.stringify(res.ops,undefined,2));
+// });
 
-  console.log(JSON.stringify(res.ops,undefined,2));
+
+
+db.collection('Users').insertOne({
+  name:'Karthik',
+  location:'Arbor',
+  age:25
+},(err,res)=>{
+  if(err){
+    return console.log('Unable to insert data' , err);
+  }
+
+console.log(JSON.stringify(res.ops,undefined,2));
 });
 
 
-//
-// db.collection('Users').insertOne({
-//   name:'Karthik',
-//   location:'Arbor',
-//   age:25
-// },(err,res)=>{
-//   if(err){
-//     return console.log('Unable to insert data' , err);
-//   }
-//
-// console.log(JSON.stringify(res.ops,undefined,2));
-// })
 
-
-
-  client.close();
+  // client.close();
 
 })

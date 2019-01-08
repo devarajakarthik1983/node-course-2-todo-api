@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 var User = mongoose.model('User', {
-  Email:{
+  email:{
     type:String,
     minglength:1,
     required:true

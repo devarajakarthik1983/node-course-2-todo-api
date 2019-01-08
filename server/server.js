@@ -36,6 +36,20 @@ app.listen(3000,()=>{
   console.log('Server is connected...');
 });
 
+
+app.post('/users',(req,res)=>{
+  // console.log(req.body);
+  var createUser = new User({
+    email: req.body.email
+  });
+  createUser.save().then((user)=>{
+    res.status(200).send(user);
+  },(err)=>{
+    res.status(400).send(err);
+  })
+});
+
+
 module.exports ={app}
 
 
