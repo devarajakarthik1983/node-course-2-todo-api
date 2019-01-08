@@ -7,7 +7,10 @@ const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 
 
+
 var app = express();
+
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
@@ -52,8 +55,8 @@ if(!todo) {
 
 
 
-app.listen(3000,()=>{
-  console.log('Server is connected...');
+app.listen(port,()=>{
+  console.log(`Server is connected on port ${port}`);
 });
 
 
