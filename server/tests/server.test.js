@@ -11,7 +11,10 @@ const todos =[{
 },
 {
   _id: new ObjectID(),
-  text:'new test2 todo'
+  text:'new test2 todo',
+  completed:true,
+  completedAt:333
+
 }]
 
 beforeEach((done)=>{
@@ -153,3 +156,58 @@ request(app)
 .expect(404)
 .end(done);
 });
+
+
+
+describe('Update Todos' ,()=>{
+  it('should update the todo' , (done)=>{
+    var hexId=todos[0]._id.toHexString();
+    var text = 'updated text';
+    request(app)
+    .patch(`/todos/${hexId}`)
+    .send({text,completed:true})
+    .expect(200)
+    .expect((res)=>{
+      expect(res.body.todo.text).toBe(text)
+      expect(res.body.todo.completed).toBe(true)
+      expect(res.body.todo.completedAt).not.toBeNull();
+
+    })
+    .end(done);
+  });
+
+  it('Update Todos set completed to false and check if completedAt is null' , (done)=>{
+    var hexId=todos[1]._id.toHexString();
+    var text = 'updated text';
+    request(app)
+    .patch(`/todos/${hexId}`)
+    .send({text,completed:false})
+    .expect(200)
+    .expect((res)=>{
+      expect(res.body.todo.text).toBe(text)
+      expect(res.body.todo.completed).toBe(false)
+      expect(res.body.todo.completedAt).toBeNull();
+
+    })
+    .end(done);
+  });
+
+
+});
+
+  // describe('Update Todos set completed to false and check if completedAt is null' ,()=>{
+  //   it('should update the todo' , (done)=>{
+  //     var hexId=todos[1]._id.toHexString();
+  //     var text = 'updated text';
+  //     request(app)
+  //     .patch(`/todos/${hexId}`)
+  //     .send({text,completed:true})
+  //     .expect(200)
+  //     .expect((res)=>{
+  //       expect(res.body.todo.text).toBe(text)
+  //       expect(res.body.todo.completed).toBe(false)
+  //       expect(res.body.todo.completedAt).toBeNull();
+  //
+  //     })
+  //     .end(done);
+  //   });
