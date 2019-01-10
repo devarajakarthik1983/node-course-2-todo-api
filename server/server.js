@@ -105,7 +105,21 @@ app.patch('/todos/:id' ,(req,res)=>{
 });
 
 
+//User API calls
 
+app.post('/users',(req,res)=>{
+  var body = _.pick(req.body,['email','password']);
+  var createUser = new User(body);
+  createUser.save().then(()=>{
+    // res.status(200).send(doc);
+    return createUser.generateAuthToken();
+  }).then((token)=>{
+    res.header('x-auth',token).send(createUser);
+  }).catch((e)=>{
+    res.status(400).send(e);
+  })
+
+});
 
 
 
