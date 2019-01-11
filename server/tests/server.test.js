@@ -322,8 +322,28 @@ describe('POST /users/login' , ()=>{
     });
 
   });//end of test case 2
+});//end of describe block
 
 
+describe('token should vbe deleted and user logs out',()=>{
+  it('should delete the token' ,(done)=>{
+    request(app)
+    .delete('/users/me/token')
+    .set('x-auth',users[0].tokens[0].token)
+    .expect(200)
+    .end((err,res)=>{
+      if(err){
+        return done(err);
+      }
+
+      User.findById(users[0]._id).then((user)=>{
+        expect(user.tokens.length).toBe(0);
+        done();
+      }).catch((e)=>{
+        done(e);
+      })
+    })
+  })
 
 });//end of describe block
 
