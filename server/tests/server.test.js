@@ -236,6 +236,8 @@ it('should create user when req is valid' ,(done)=>{
       expect(user).toExist();
       expect(user.password).toNotBe(password);
       done();
+    }).catch((e)=>{
+      done(e);
     })
   })
 
@@ -266,6 +268,64 @@ it('should not create user whose email in use',(done)=>{
 });// end of test case3
 
 });//end  of descrive block
+
+
+describe('POST /users/login' , ()=>{
+
+  it('should send the token when valid email and password is sent' ,(done)=>{
+    request(app)
+    .post('/users/login')
+    .send({email:users[1].email, password:users[1].password})
+    .expect(200)
+    .expect((res)=>{
+      expect(res.headers['x-auth']).toExist();
+      expect(res.body.email).toBe(users[1].email);
+    })
+    .end((err,res)=>{
+      if(err){
+        return done();
+      }
+
+      User.findById(users[1]._id).then((user)=>{
+        expect(user.tokens[0]).toInclude({
+          access:'auth',
+          token: res.headers['x-auth']
+        });
+        done();
+      }).catch((e)=>{
+        done(e);
+      })
+    });
+
+  });//end of test case 1
+
+  it('should send 400 bad request when Invalid email and password is sent' ,(done)=>{
+    request(app)
+    .post('/users/login')
+    .send({email:users[1].email, password:'23wer'})
+    .expect(400)
+    .expect((res)=>{
+      expect(res.headers['x-auth']).toNotExist();
+
+    })
+    .end((err,res)=>{
+      if(err){
+        return done();
+      }
+
+      User.findById(users[1]._id).then((user)=>{
+        expect(user.tokens.length).toBe(0);
+        done();
+      }).catch((e)=>{
+        done(e);
+      })
+    });
+
+  });//end of test case 2
+
+
+
+});//end of describe block
 
   // describe('Update Todos set completed to false and check if completedAt is null' ,()=>{
   //   it('should update the todo' , (done)=>{
