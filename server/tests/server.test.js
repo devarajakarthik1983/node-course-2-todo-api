@@ -1,29 +1,17 @@
 const expect = require('expect');
 const request = require('supertest');
 const {ObjectID} =require('mongodb');
-
+const {todos,populateTodos,users,populateUsers} = require('./seed/seed')
 
 
 var {app} = require('./../server');
 var {Todo} = require('./../models/todo');
+var {User} = require('./../models/user');
 
-const todos =[{
-  _id: new ObjectID(),
-  text:'new test todo'
-},
-{
-  _id: new ObjectID(),
-  text:'new test2 todo',
-  completed:true,
-  completedAt:333
 
-}]
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
-beforeEach((done)=>{
-  Todo.remove({}).then((docs)=>{
-    return Todo.insertMany(todos);
-  }).then(()=> done());
-});
 
 describe('POST /todos' , ()=>{
   it('should post a todo item' ,(done)=>{
@@ -196,6 +184,88 @@ describe('Update Todos' ,()=>{
 
 
 });
+
+
+
+describe('GET .users/me' ,()=>{
+
+  it('should return the user when proper token is passed' , (done)=>{
+    request(app)
+    .get('/users/me')
+    .set('x-auth',users[0].tokens[0].token)
+    .expect(200)
+    .expect((res)=>{
+      expect(res.body.email).toBe(users[0].email);
+      expect(res.body._id).toBe(users[0]._id.toHexString());
+    })
+    .end(done);
+  });
+
+it('should return 404 bad request when no token or invalid token is passed',(done)=>{
+  request(app)
+  .get('/users/me')
+  .expect(401)
+  .expect((res)=>{
+    expect(res.body).toEqual({});
+  })
+  .end(done);
+})
+
+});
+
+describe('POSTS /users' , ()=>{
+
+it('should create user when req is valid' ,(done)=>{
+  var email ='testuser1@email.com';
+  var password ='pass123';
+  request(app)
+  .post('/users')
+  .send({email,password})
+  .expect(200)
+  .expect((res)=>{
+    expect(res.headers['x-auth']).toExist();
+    expect(res.body.email).toBe(email);
+    expect(res.body._id).toExist();
+  })
+  .end((err)=>{
+    if(err){
+      return done(err);
+    }
+
+    User.findOne({email}).then((user)=>{
+      expect(user).toExist();
+      expect(user.password).toNotBe(password);
+      done();
+    })
+  })
+
+});//end of test case 1
+
+it('should return validation error if the request is invalid',(done)=>{
+request(app)
+.post('/users')
+.send({
+  email:'test',
+  password:'123'
+})
+.expect(400)
+.end(done);
+
+});//end of test case 2
+
+it('should not create user whose email in use',(done)=>{
+  request(app)
+  .post('/users')
+  .send({
+    email:'andrew@example.com',
+    password:'123'
+  })
+  .expect(400)
+  .end(done);
+
+});// end of test case3
+
+});//end  of descrive block
 
   // describe('Update Todos set completed to false and check if completedAt is null' ,()=>{
   //   it('should update the todo' , (done)=>{
